@@ -44,7 +44,10 @@ This lab covers setting up Azure IoT Central, creating a Device Template and add
 
 1. Leave the "Gateway Device" checkbox **unchecked**, click the **Next: Review** button, then click **Create**
 
-1. Name your Device Template **SensorTile.box**, press Return and then click **Import Capability Model**.
+1. Name your Device Template **SensorTile.box**, press Return 
+![](./media/lab02/device_template_name_template.png)
+
+1. Click **Import Capability Model**.
 ![](./media/2_iotc4.png)
 
 1. Browse to the `C:\Labs\Content\src\Azure.IoTCentral\` folder and upload the file named `ST SensorTile.Box.json`.
@@ -66,7 +69,7 @@ This lab covers setting up Azure IoT Central, creating a Device Template and add
 3. Click on your new device to see the device dashboard. There should be no data showing yet.
 ![](./media/2_iotc9.png)
 
-4. Click the **Connect** button and record the `Scope ID`, `Device ID` and `Primary Key`. These are the Azure IoT Hub Device Provisioning Service (DPS) details. You will need these to set up your device.
+4. Click the **Connect** button and record the `Scope ID`, `Device ID` and `Primary Key` into the **notes** file which you can find on your desktop. These are the Azure IoT Hub Device Provisioning Service (DPS) details. You will need these to set up your device.
 ![](./media/2_iotc10.png)
 
 ## 2 - Configure device to connect to IoT Central
@@ -78,19 +81,21 @@ We will be using the dpsgen.com website to generate a configuration file with a 
 
 1. Open a browser tab and navigate to [www.dpsgen.com/iia](https://www.dpsgen.com/iia).
 
-2. Enter the `Scope ID`, `Device ID` and `Primary Key` collected earlier and click **Generate JSON**. 
+2. Enter the `Scope ID`, `Device ID` and `Primary Key` collected earlier from the **notes** file on your desktop and click **Generate JSON**. 
 1. Navigate to the download location for the tpmoverride.json file and open the file. If it is full of "null" that indicates that the dpsgen website had issues creating your connection string. In this case try again but if it still persists then you will have to use the [https://github.com/Azure/dps-keygen](https://github.com/Azure/dps-keygen) method.
 
 3. Open a Command Prompt as Administrator.
-4. Copy the `tpmoveride.json` file to the HummingBoard by replacing the IP address in each of the following two commands with the IP Address of your HummingBoard device, then run the two commands in your command prompt window; one command after the other:
-```batch
-net use \\<device ip address here>\c$ /USER:administrator
-copy "%userprofile%\Downloads\tpmoverride.json" \\<device ip address here>\c$\Data\Users\DefaultAccount\AppData\Local\Packages\IoTLabs.TestApp.App_wqmbmn0a4bde6\LocalState /y
-```
-![](./media/2_13.png)
 
-5. Use Visual Studio to stop and then restart the application. Once started you should see Azure IoT now showing as connected.
+4. Open Device Portal then select 'File Manager'
+![](./media/lab02/FileManager.png)
 
+5. Browse to 'LocalState' folder of IoTLabs.TestApp.  
+![](./media/lab02/BrowseToAppFolder.png)
+
+6. Select 'Choose File' and navigate to the 'tpmoverride.json' in 'Downloads' folder from step above, then click 'upload' to copy the JSON file to IoT Core.
+![](./media/lab02/UploadFile.png)
+
+7. Use Visual Studio or Device Dashboard to stop and then restart the application. Once started you should see Azure IoT now showing as connected.
 ![](./media/2_14.png)
 
 6. Switching back to IoT Central, you should be able to see data in the dashboard as well.

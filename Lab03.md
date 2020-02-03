@@ -12,12 +12,12 @@ Azure Resource Manager Templates (ARM Templates) can be deployed into Azure that
 1. Log in with the lab credentials provided.  
 **lab.user##@msiotlabs.com where ## are replaced with the number of your lab workstation. 
 eg. #1 would be lab.user01@msiotlabs.com** 
-1. Click the 'Deploy to Azure' button below to create the Azure IoT components required for the next labs:<br/><br/>
+1. Click the 'Deploy to Azure' button **below on this page** to create the Azure IoT components required for the next labs:<br/><br/>
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fawaregroup%2FIIALab%2Fmaster%2Fsrc%2FAzure.ARM%2Fiia-azuredeploy.json" target="_blank" rel="noopener noreferrer">
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.png"/>
 </a>
 
-3. You can also visualize an ARM template to see the components that will be created.
+3. You can also visualize an ARM template to see the components that will be created.<br/><br/>
 <a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fawaregroup%2FIIALab%2Fmaster%2Fsrc%2FAzure.ARM%2Fiia-azuredeploy.json" target="_blank" rel="noopener noreferrer">
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png"/>
 </a><br/><br/>
@@ -91,7 +91,7 @@ The Edge version of Stream Analytics allows us to run this service inside a cont
 
 ### 2.4 - Container Registry
 
-Container Registry is a private docker container registry that you can push containers to. When combined with IoT Edge, you can store the containers to be used by your edge devices. Your proprietary code can stay protected in your own container registry rather than a public registry.
+Container Registry is a private docker container registry that you can push containers to. When combined with IoT Edge, you can store the containers to be used by your edge devices. Your proprietary code can stay protected in your own container registry rather than a public registry. Take note of your **container registry name** with the **notes** file on your desktop, We will be using it in Lab05.
 
 ![](./media/lab03/3_9.png)
 
@@ -128,33 +128,31 @@ Custom Vision allows you to leverage the compute infrastructure in Azure to trai
 
 ### 4.1 - Create Device in Azure IoT Hub
 
-1. Make a note of the Lab PC number  printed on the device. For example, #1 would convert to the **LAB.USER01**
+1. Open a browser and navigate to the [Azure Portal (portal.azure.com)](https://portal.azure.com). Log in with the lab credentials provided
 
-2. Open a browser and navigate to the [Azure Portal (portal.azure.com)](https://portal.azure.com). Log in with the lab credentials provided
-
-3. Select **Resource groups** from the Azure Portal homepage.
+2. Select **Resource groups** from the Azure Portal homepage.
 ![](./media/lab03/azure%20dashboard.png)
 
-4. Select the **msiotlabs-iia-user##** resource group in the list and choose the **IoT Hub** (this is the same IoT Hub resource that we explored earlier in step 2.1 of this lab).
+3. Select the **msiotlabs-iia-user##** resource group in the list and choose the **IoT Hub** (this is the same IoT Hub resource that we explored earlier in step 2.1 of this lab).
 
-5. In the IoT Hub menu under the heading **Automatic Device Management**, click **IoT Edge**\
+4. In the IoT Hub menu under the heading **Automatic Device Management**, click **IoT Edge**\
 ![](./media/lab03/SelectIoTEdge.png)
 
-6. Click **Add an IoT Edge device** at the top of the page
+5. Click **Add an IoT Edge device** at the top of the page
 
-7. Enter the Lab PC name (from earlier) as the device id, leave the rest of the settings as default and click **Save**
+6. Enter your Lab PC number printed on the device as the **Device Id**. For example #1 would convert to the **LAB.USER01**. Leave the rest of the settings as default and click **Save**
 ![](./media/lab03/add-device.jpg)
 
-8. Click **Refresh** and your newly created device should appear in the list
+7. Click **Refresh** and your newly created device should appear in the list
 
-9. Take note of your **Device Id** (red circle) and your **IoT Hub Name** (red square) You will need to refer to these in future steps
+8. Take note of your **Edge Device Id** (red circle) and your **IoT Hub Name** (red square). Enter them into the the **Notes** file on your desktop, you will need to refer to these variables in future steps
 ![](./media/lab03/DeviceAndHubDetails.png)
 
-10. Select your device and take note of the **Primary Connection String**. We will be using it in the next step, so keep this page ready or save the into a document on your desktop for ease\
-![](./media/lab03/CopyConnectionStringIoTEdge.png)
+9. Select your device by clicking red circle in the picture above, then click the copy button to copy the **Primary Connection String**.  Paste this value into the **Notes** file on your desktop as we will be using it to set up the device in the next step.\
+![](./media/lab03/4_CopyConnectionStringIoTEdge.png)
 
 ### 4.2 - IoT Device setup using Azure CLI
-**Note:** This next step will cause your Lab PC to reboot, so now is a good time to save any documents that you have open.
+**Note:** This next step may cause your Lab PC to reboot, so now is a good time to save any documents that you have open.
 
 1. On your Lab PC, open the Start Menu and type **PowerShell**, then click **Run as Administrator**\
 ![](./media/lab03/powershell.jpg)
@@ -165,17 +163,15 @@ Custom Vision allows you to leverage the compute infrastructure in Azure to trai
 ```powershell
 . {Invoke-WebRequest -useb aka.ms/iotedge-win} | Invoke-Expression; Deploy-IoTEdge
 ```
- 
 
-4. When prompted, press **Y** two times, including one to reboot. 
+4. When prompted, press **Y** to install.
 ![](./media/lab03/iotedge-install.jpg)
 
-5. When the system has booted again, re-open the PowerShell session as Administrator
-6. Configure the Azure IoT Edge runtime with the following command:
+5. Configure the Azure IoT Edge runtime with the following command:
 ```powershell
 . {Invoke-WebRequest -useb aka.ms/iotedge-win} | Invoke-Expression; Initialize-IoTEdge
 ```
-7. When prompted, enter the Device Connection string from the previous step, including the SharedAccessKey
+6. When prompted, enter the Device Connection string from the previous step, including the SharedAccessKey
 ![](./media/lab03/iot-edge-initialize.png)
 
 ### 4.3 - Prepare your docker lab environment
@@ -198,7 +194,7 @@ Run the following powershell command to examine service logs from the last 5 min
 ```PowerShell
 . {Invoke-WebRequest -useb https://aka.ms/iotedge-win} | Invoke-Expression; Get-IoTEdgeLog
 ```
-Run the following powershell command to run an automated check for the most common configuration and networking errors.
+Run the following powershell command to run an automated check for the most common configuration and networking errors. There will be 4 yellow warnings relating to production readiness and 1 red error message relating to the Edge Hub container. The yellow warnings can be ignored within our lab environment and the red error message will resolve during the next lab when we deploy modules to our IoT Edge instance for the first time.
 
 ```PowerShell
 iotedge check

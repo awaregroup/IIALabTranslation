@@ -27,28 +27,28 @@ az login
 ```powershell
 az account set --subscription 'MSIoTLabs-IIA'
 ```
-4. Run the following command replacing **[device id]** and **[hub name]** with their respective fields (found in the IoT Hub set up in Lab 3):
+4. Run the following command replacing **[Edge Device id]** and **[IoT Hub Name]** with their respective fields from the **notes** file on your desktop (also found in the IoT Hub set up in Lab 3):
 ```powershell
-az iot edge set-modules --device-id [device id] --hub-name [hub name] --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.example.win-x64.json"
+az iot edge set-modules --device-id [Edge device id] --hub-name [IoT Hub Name] --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.template.lab04.win-x64.json"
 
 #NOTE - entries are case sensitive and must be exactly the same as in the Azure port. Also make sure to remove the square brackets above, for example:
-#az iot edge set-modules --device-id labuser01 --hub-name msiotlabs-iia-user01-iothub --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.example.win-x64.json"
+#az iot edge set-modules --device-id labuser01 --hub-name msiotlabs-iia-user01-iothub --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.template.lab04.win-x64.jsons"
 ```
 
 ### 1.2 - Verify Deployment on IoT Edge Device
 The module deployment is instant, however, changes to the device can take around 5-7 minutes to take effect. This means it can take a while for the new container to be loaded. The following commands can be used to check the status of the SimulatedTemperatureSensor container:
 
-1. To validate the Azure IoT Edge runtime installation, continue within PowerShell and use the command:
-```powershell
-iotedge check
-``` 
-
-2. Run the following PowerShell command to see the current modules:
+1. Run the following PowerShell command to view the current modules. You should see 3 modules in total once the modules have been deployed to the device.
 ```powershell
 iotedge list
 ```
 
-3. Try running the following to see the logs from our simulated temperature sensor:
+1. Next run validation of the Azure IoT Edge runtime installation to ensure there are no errors. Note that there will still be warnings that can be safely ignored. Continue within PowerShell and use the command:
+```powershell
+iotedge check
+``` 
+
+1. Try running the following to see the logs from our simulated temperature sensor:
 ```powershell
 iotedge logs SimulatedTemperatureSensor
 ```
@@ -56,9 +56,9 @@ iotedge logs SimulatedTemperatureSensor
 Your device should be receiving simulated temperature data every 5 seconds with the machine temperature steadily rising.
 
 ### 1.3 - Monitor Device-to-Cloud messages
-1. Enter the following command to monitor Device-to-Cloud (D2C) messages being published to the IoT Hub replacing **[device id]** and **[hub name]** with their respective fields from [step 1.1](#11---cloud-setup):
+1. Enter the following command to monitor Device-to-Cloud (D2C) messages being published to the IoT Hub replacing **[Edge Device Id]** and **[IoT Hub Name]** with their respective fields from the **notes** file on your desktop:
 ```powershell
-az iot hub monitor-events --device-id [device id] --hub-name  [hub name]
+az iot hub monitor-events --device-id [Edge Device Id] --hub-name  [IoT Hub Name]
 
 #NOTE - make sure to remove the square brackets above, for example:
 #az iot hub monitor-events --device-id device1 --hub-name  msiotlabs-iia-user06-iothub
@@ -145,25 +145,26 @@ Stream Analytics can be used to enable complex logic on streams of data. This qu
 
 **Note:** You may have to click on the **Edge job** dropdown for the save button to show.
 
-6. When the module has loaded, select **Configure** and take note of the **Name** field. You will be using this module name in the next step
-![Adding ASA Module](./media/lab04/configure-and-read-name.png)
+6. When the module has loaded, take note of the **Name** field as **module name** with the **notes** file on your desktop. You will be using this module name in the next step
+![Adding ASA Module](./media/lab04/NextToRoute.png)
 
-7. Click **Save**, then **Next**
+7. Click **Next:Routes**
 
-### 3.2 - Selecting the routes
-1. Replace the current JSON with the following, substituting **[module name]** with the module name found in the previous step. There are 3 places that **[module name]** needs to be changed:
+### 3.2 - Adding the routes
+  
+1. Remove the existing routes and edit the routing table to look like the image below by copying the fields in the following table and substituting **[module name]** with the module name found in the **notes** file on your desktop. There are 3 places that **[module name]** needs to be changed:
 
-```javascript
-{
-    "routes": {
-        "telemetryToCloud": "FROM /messages/modules/SimulatedTemperatureSensor/* INTO $upstream",
-        "alertsToCloud": "FROM /messages/modules/[module name]/* INTO $upstream",
-        "alertsToReset": "FROM /messages/modules/[module name]/* INTO BrokeredEndpoint(\"/modules/SimulatedTemperatureSensor/inputs/control\")",
-        "telemetryToAsa": "FROM /messages/modules/SimulatedTemperatureSensor/* INTO BrokeredEndpoint(\"/modules/[module name]/inputs/temperature\")"
-    }
-}
-```
-2. Select **Next**, then **Submit**
+
+|Name     |Value  |
+|---------|---------|
+|telemetryToCloud     | FROM /messages/modules/SimulatedTemperatureSensor/* INTO $upstream        |
+|alertsToCloud     | FROM /messages/modules/**[module name]**/* INTO $upstream        |
+|alertsToReset     |FROM /messages/modules/**[module name]**/* INTO BrokeredEndpoint("/modules/SimulatedTemperatureSensor/inputs/control")         |
+|telemetryToAsa     | FROM /messages/modules/SimulatedTemperatureSensor/* INTO BrokeredEndpoint("/modules/**[module name]**/inputs/temperature")        |
+
+![Adding ASA Module](./media/lab04/Route.png)
+
+2. Select **Next:Review + create**, then **Create**
 
 ### 3.3 - Verify Deployment on IoT Edge Device
 The module deployment is instant, however, changes to the device can take around 5-7 minutes to take effect. Let's check that our device has loaded our Azure Stream Analytics module from the last step.
@@ -178,12 +179,14 @@ iotedge list
 
 3. Try running the following to see the logs from our simulated temperature sensor:
 ```powershell
-iotedge logs SimulatedTemperatureSensor
+iotedge logs -f --tail 5 SimulatedTemperatureSensor
 ```
+**Note:** Use Ctrl-C to stop monitoring as we will be doing more PowerShell commands soon.
+
 You should see that the machine temperature increases until it reaches a temperature higher than the 26 degree threshold for at least 30 seconds.
 ![Temperature Reset](./media/lab04/temperature-reset.jpg)
 
-4. When the SimulatedTemperatureSensor container stops producing data you can reset it to start over
+4. When the SimulatedTemperatureSensor container stops producing data you can reset it to start over:
 ```powershell
 iotedge restart SimulatedTemperatureSensor
 ```
@@ -194,9 +197,12 @@ iotedge restart SimulatedTemperatureSensor
 
 2. Click on **Message Routing**
 
-3. Choose the existing route and click **Enable**
+3. Choose the existing route named **SendTelemetryToEventHub** and click **Enable Route**
+
+![Enabling Route to send telemetry to Event Hub](./media/lab04/4_2_EnableRoute.png)
 
 4. Save changes
+
 
 This step will enable telemetry to flow into Time Series Insights which you can view from the common Resource Group.
 

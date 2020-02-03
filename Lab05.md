@@ -15,11 +15,12 @@ When starting the lab, you should have these things open on your development mac
 
 ## 1 - Custom Vision
 
-### 1.1 - Capture training images
+### 1.1 - Training images
 
-1. Using the Camera app on your development Lab PC, take at least 5 pictures each of your objects (perhaps 3 different objects with 5 photos of each making 15 in total).  There are no specifcations as to backgrounds, etc. 
-    * Store these pictures on your computer. 
-    * Organize all the photos for each object into a folder named for this object - this will make them easier to upload.
+1. On your development Lab PC in `C:\Labs\src\IoTLabs.Lab5Images` are  different objects with 5+ photos of each. The photos are organized in a folder named for each type of object - this will make them easier to upload.
+  ![Custom Vision Pictures](./media/lab05/CustomVisionPictures.png)
+
+
     
 ### 1.2 - Create a Custom Vision Image Classification project
 
@@ -50,8 +51,10 @@ When starting the lab, you should have these things open on your development mac
 ### 1.3 - Upload and tag training data
 
 1. Click the Add image button and bulk upload your images based on the object type.
-    * Upload all of object1 first and add the object1 tag, then all of object2 and add the object2 tag, etc. Hold down the ctrl key to select multiple photos of the same object and it will label them with all the same tag.
-    * Each time you upload all the images for a given object, specify the tag at that time.
+    * Upload five+, but not all of the first object picture and add the object tag. Then upload five+ of the second object and add the object2 tag, etc. Hold down the ctrl key to select multiple photos of the same object and it will label them with all the same tag.
+    * Each time you upload the images for a given object, specify the tag at that time.
+
+    **Note:** You will use the pictures you did not upload to the Custom Vision model to test the model later. 
 
 1. Example of bulk uploading and tagging images.
    ![Upload and tag images](./media/lab05/upload-and-tag-images.jpg)
@@ -112,13 +115,12 @@ When starting the lab, you should have these things open on your development mac
 
 ### 2.3 - Build & Test the sample
 
-1. Open a Command Prompt window and enter the following 4 lines of commands, **one after the other**. These commands build, then runs the application using our machine learning model and the images in the `C:/images` folder as the test data:
+1. Open a Command Prompt window and enter the following 4 lines of commands, **one after the other**. These commands build and package the application into a release folder then runs the application using our machine learning model and the images in the `C:/images` folder as the test data:
 
 ```
 cd C:\Labs\Content\src\IoTLabs.CustomVision
-dotnet restore -r win-x64
 dotnet publish -c Release -o ./release -r win-x64 --self-contained true
-dotnet run -i --model=CustomVision.onnx
+./release/WindowsAiEdgeLabCV.exe -i --model=CustomVision.onnx
 ```
 
 **Example output:**
@@ -146,7 +148,7 @@ The following steps assume that you have created a Azure Container Registry in L
 
 1.  Open PowerShell **as Administrator** (right click on the PowerShell entry and select Run as Administrator) and run the following commands:
 
-3. Update the **$registryName** variable below, then run the commands.
+3. Update the **$registryName** variable below by substituting the **[azure-container-registry-name]** with its value in the **notes** file on your desktop, then run the commands.
 
 **Note:** each time you rebuild the container, you should increment the **$version** variable.
 
@@ -162,7 +164,7 @@ $containerTag = "$registryName.azurecr.io/$($imageName):$version-x64-win1809"
 docker build . -t $containerTag
 ```
 
-4.  Type **$containerTag** and press **Enter** to get the full container string. Save a copy of this value as you will need it in step 5.3.
+4.  Type **$containerTag** and press **Enter** to get the full container string. Save a copy of this value with the **notes** file on your desktop as you will need it in step 5.3.
 
 ## 4 - Push Docker image to Azure Container Registry (ACR)
 
@@ -217,7 +219,7 @@ Now that we have a container image with our inferencing logic stored in our cont
 
 **Hint:** Refer to the page from the previous step, for details such as usernames and passwords.
 
-**Hint:** You can type **$containerTag** in PowerShell to get the full container string required to replace ACR_IMAGE.
+**Hint:** You can type **$containerTag** in PowerShell or found its value in the **notes** file on your desktop to get the full container string required to replace ACR_IMAGE.
 
 **Hint:** The ACR_IMAGE variable is in the customvision module definition.
 
@@ -225,19 +227,19 @@ Now that we have a container image with our inferencing logic stored in our cont
 
 Using the IoT Edge device that we created in Lab03, we will overwrite the modules with a new 'custom vision' module.
 
-1. Replace **[device name]** and **[hub name]**, then run the following command in PowerShell:
+1. Replace **[Edge Device Id]** and **[IoT Hub Name]** with their respective values from the **notes** file on your desktop, then run the following command in PowerShell:
 
 ```
 #SAMPLE: az iot edge set-modules --device-id IOTEDGE01 --hub-name msiotlabs-iia-user01-iothub --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.template.lab05.win-x64.json"
-az iot edge set-modules --device-id [device name] --hub-name [hub name] --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.template.lab05.win-x64.json"
+az iot edge set-modules --device-id [Edge Device Id] --hub-name [IoT Hub Name] --content "C:\Labs\Content\src\IoTLabs.IoTEdge\deployment.template.lab05.win-x64.json"
 ```
 
 **Hint:** Device ID can be retrieved from the Azure Portal by navigating to your Resource group, then into the IoT Hub, and selecting the IoT Edge option under the Automatic Device Manager header on the left.
 
-2. To get information about the modules deployed to your IoT Hub, swap out **[device name]** and **[hub name]** then run the following command:
+2. To get information about the modules deployed to your IoT Hub, swap out **[Edge Device Id]** and **[IoT Hub Name]** then run the following command:
 ```
 #SAMPLE: az iot hub module-identity list  --device-id IOTEDGE01 --hub-name msiotlabs-iia-user01-iothub
-az iot hub module-identity list --device-id [device name] --hub-name [hub name]
+az iot hub module-identity list --device-id [Edge Device Id] --hub-name [IoT Hub Name]
 ```
 
 ### 5.4 - Verify the deploy has started in Azure
